@@ -21,10 +21,6 @@ public interface RecordRepository extends JpaRepository<Record, Integer>, JpaSpe
     @Query(value = "select env_name from mts.environments where is_reference_environment is true", nativeQuery = true)
     List<String> findAllReferenceEnvs();
 
-    @Query(value = "select name from mts.names", nativeQuery = true)
-    List<String> findAllNames();
-
-
     @Query(value = "select env_name from mts.environments", nativeQuery = true)
     List<String> findAllEnvironments();
 

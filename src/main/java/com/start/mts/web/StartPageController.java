@@ -2,8 +2,12 @@ package com.start.mts.web;
 
 import com.start.mts.ObjectValidator;
 import com.start.mts.RecordService;
+import com.start.mts.db.EnvironmentRepository;
+import com.start.mts.db.NameRepository;
 import com.start.mts.db.RecordRepository;
 import com.start.mts.domain.Actions;
+import com.start.mts.domain.Environment;
+import com.start.mts.domain.Name;
 import com.start.mts.domain.Record;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,10 @@ public class StartPageController {
     RecordService service;
     @Autowired
     RecordRepository repository;
+    @Autowired
+    EnvironmentRepository environmentRepository;
+    @Autowired
+    NameRepository nameRepository;
     @Autowired
     ObjectValidator validator;
 
@@ -41,10 +49,10 @@ public class StartPageController {
         Actions[] actions = Actions.values();
         model.addAttribute("actions", actions);
 
-        List<String> referenceEnvs = service.getReferenceEnvironments();
+        List<Environment> referenceEnvs = environmentRepository.findAllByIsReferenceEnvironment(true);
         model.addAttribute("referenceEnvs", referenceEnvs);
 
-        List<String> names = service.getNames();
+        List<Name> names = nameRepository.findAll();
         model.addAttribute("names", names);
 
         List<Record> records = service.findByCriteria(filterTicketId,
@@ -88,7 +96,7 @@ public class StartPageController {
             setError(model, "Not valid object");
         }
 
-        return "startPage";
+        return "staticData";
     }
 
     void setError(Model model, String errorMsg) {

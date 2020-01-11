@@ -38,7 +38,7 @@ public class Record {
         this.envs = envs;
     }
 
-    public List<EnvDeploy> getEnvs() {
+    public List<EnvDeploy> getEvironments() {
         return envs;
     }
 
@@ -112,7 +112,7 @@ public class Record {
 
     public boolean isEnvDeployed(String envName) {
         if (envName != null) {
-            List<EnvDeploy> envs = this.getEnvs();
+            List<EnvDeploy> envs = this.getEvironments();
             for (EnvDeploy env : envs) {
                 if (envName.equals(env.getEnv())) {
                     return true;

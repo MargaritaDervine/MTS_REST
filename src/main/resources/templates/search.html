@@ -33,8 +33,8 @@
                 <select class="form-control " id="filterName" name="filterName">
                     <option disabled="disabled" selected value=" "> -- select name --</option>
                     <option th:each="name : ${names}"
-                            th:value="${name}"
-                            th:text="${name}">
+                            th:value="${name.getName()}"
+                            th:text="${name.getName()}">
                     </option>
                 </select>
             </div>

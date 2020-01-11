@@ -2,10 +2,10 @@ package com.start.mts.web;
 
 import com.start.mts.RecordService;
 import com.start.mts.db.EnvDeployRepository;
+import com.start.mts.db.EnvironmentRepository;
+import com.start.mts.db.NameRepository;
 import com.start.mts.db.RecordRepository;
-import com.start.mts.domain.Actions;
-import com.start.mts.domain.EnvDeploy;
-import com.start.mts.domain.Record;
+import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,7 +26,11 @@ public class AdminPageController {
     @Autowired
     EnvDeployRepository envDeployRepository;
     @Autowired
+    EnvironmentRepository environmentRepository;
+    @Autowired
     RecordRepository repository;
+    @Autowired
+    NameRepository nameRepository;
 
     @RequestMapping(value = "/adminPage", method = RequestMethod.GET)
     public String getRecords(@RequestParam(required = false) String filterTicketId,
@@ -48,10 +52,10 @@ public class AdminPageController {
         List<String> envs = service.getAllEnvironments();
         model.addAttribute("envs", envs);
 
-        List<String> referenceEnvs = service.getReferenceEnvironments();
+        List<Environment> referenceEnvs = environmentRepository.findAllByIsReferenceEnvironment(true);
         model.addAttribute("referenceEnvs", referenceEnvs);
 
-        List<String> names = service.getNames();
+        List<Name> names = nameRepository.findAll();
         model.addAttribute("names", names);
 
         List<Record> records = service.findByCriteria(filterTicketId,
@@ -66,9 +70,15 @@ public class AdminPageController {
 
     @RequestMapping(value = "/adminPage", method = RequestMethod.POST)
     public String addNewDeploy(Model model,
-                               @RequestParam(value = "env", required = true) String env,
-                               @RequestParam(value = "ticketNumber", required = true) String ticketNumber,
-                               @RequestParam(value = "date", required = false) String dateStr) {
+                               @RequestParam(value = "env", required = false) String env,
+                               @RequestParam(value = "ticketNumber", required = false) String ticketNumber,
+                               @RequestParam(value = "date", required = false) String dateStr,
+                               @RequestParam(value = "deleteId", required = false) int deleteId) {
+
+        if (deleteId != 0) {
+            repository.deleteById(deleteId);
+            return "adminPage";
+        }
 
         if (StringUtils.isEmpty(env) || StringUtils.isEmpty(ticketNumber)) {
             model.addAttribute("error", "Missing field values");
@@ -107,7 +117,7 @@ public class AdminPageController {
     }
 
     private void addToRecordAndSave(Record record, EnvDeploy deploy) throws Exception {
-        List<EnvDeploy> list = record.getEnvs();
+        List<EnvDeploy> list = record.getEvironments();
         list.add(deploy);
         record.setEnvs(list);
         save(deploy);

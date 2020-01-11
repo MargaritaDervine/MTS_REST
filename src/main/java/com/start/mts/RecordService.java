@@ -57,22 +57,10 @@ public class RecordService {
         return types;
     }
 
-    public List<String> getReferenceEnvironments() {
-        List<String> refEnvs = repository.findAllReferenceEnvs();
-        java.util.Collections.sort(refEnvs);
-        return refEnvs;
-    }
-
     public List<String> getAllEnvironments() {
         List<String> refEnvs = repository.findAllEnvironments();
         java.util.Collections.sort(refEnvs);
         return refEnvs;
-    }
-
-    public List<String> getNames() {
-        List<String> names = repository.findAllNames();
-        java.util.Collections.sort(names);
-        return names;
     }
 
     public String highestEnvironmentDeployed(Record record) {

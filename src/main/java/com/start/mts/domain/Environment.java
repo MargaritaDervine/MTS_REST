@@ -6,8 +6,6 @@ import javax.persistence.*;
 @Table(name = "environments", schema = "mts")
 public class Environment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int envId;
     String EnvName;
     boolean isReferenceEnvironment;
 
@@ -19,9 +17,6 @@ public class Environment {
     public Environment() {
     }
 
-    public int getEnvId() {
-        return envId;
-    }
 
     public String getEnvName() {
         return EnvName;
@@ -31,9 +26,6 @@ public class Environment {
         return isReferenceEnvironment;
     }
 
-    public void setEnvId(int envId) {
-        this.envId = envId;
-    }
 
     public void setEnvName(String envName) {
         EnvName = envName;

@@ -29,6 +29,15 @@
 </div>
 <div class="container-fluid">
 
+
+    <script>
+        var recordsVar = records;
+        for (var i =0; i <= records.length; i++) {
+        i.getTicketNumber();
+        }
+    </script>
+
+
     <!--Search menus-->
     <div th:insert="search"></div>
 
@@ -39,7 +48,7 @@
             <form th:action="@{/}" method="post" enctype="multipart/form-data">
                 <div class="form-row">
                     <div class="col">
-                        <input type="text" class="form-control " name="ticketNumber" placeholder="Ticket number"/>
+                        <input type="text" class="form-control" name="ticketNumber" placeholder="Ticket number"/>
                     </div>
                     <div class="col">
                         <select class="form-control " id="actions" name="action">
@@ -63,16 +72,16 @@
                     <div class="col">
                         <select class="form-control " id="names" name="name">
                             <option th:each="name : ${names}"
-                                    th:value="${name}"
-                                    th:text="${name}">
+                                    th:value="${name.getName()}"
+                                    th:text="${name.getName()}">
                             </option>
                         </select>
                     </div>
                     <div class="col">
                         <select class="form-control " id="referenceEnvs" name="refEnv">
                             <option th:each="refEnv : ${referenceEnvs}"
-                                    th:value="${refEnv}"
-                                    th:text="${refEnv}">
+                                    th:value="${refEnv.getEnvName()}"
+                                    th:text="${refEnv.getEnvName()}">
                             </option>
                         </select>
                     </div>
@@ -89,7 +98,6 @@
             <div class="alert alert-danger" role="alert">Failed! <span th:text="${error}"></span></div>
         </div>
     </div>
-
 
     <!--List of records-->
     <div>
@@ -134,5 +142,8 @@
         </table>
     </div>
 </div>
+
+
+
 </body>
 </html>
