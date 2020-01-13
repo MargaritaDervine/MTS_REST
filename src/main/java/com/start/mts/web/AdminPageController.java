@@ -32,6 +32,7 @@ public class AdminPageController {
     @Autowired
     NameRepository nameRepository;
 
+
     @RequestMapping(value = "/adminPage", method = RequestMethod.GET)
     public String getRecords(@RequestParam(required = false) String filterTicketId,
                              @RequestParam(required = false) String filterObjectType,
@@ -71,16 +72,16 @@ public class AdminPageController {
     @RequestMapping(value = "/adminPage", method = RequestMethod.POST)
     public String addNewDeploy(Model model,
                                @RequestParam(value = "env", required = false) String env,
-                               @RequestParam(value = "ticketNumber", required = false) String ticketNumber,
+                               @RequestParam(value = "tickets", required = false) String tickets,
                                @RequestParam(value = "date", required = false) String dateStr,
-                               @RequestParam(value = "deleteId", required = false) int deleteId) {
+                               @RequestParam(value = "deleteId", required = false) Integer deleteId) {
 
-        if (deleteId != 0) {
+        if (deleteId != null) {
             repository.deleteById(deleteId);
             return "adminPage";
         }
 
-        if (StringUtils.isEmpty(env) || StringUtils.isEmpty(ticketNumber)) {
+        if (StringUtils.isEmpty(env) || StringUtils.isEmpty(tickets)) {
             model.addAttribute("error", "Missing field values");
             model.addAttribute("success", false);
             return "adminPage";
@@ -96,7 +97,13 @@ public class AdminPageController {
             return "adminPage";
         }
 
-        List<Record> existingRecords = repository.findByTicketNumber(ticketNumber.toUpperCase());
+        List<Record> existingRecords;
+
+        if (tickets.contains(",")) {
+            existingRecords = service.getRecordsForSeveralTickets(tickets);
+        } else {
+            existingRecords = repository.findByTicketNumber(tickets.toUpperCase());
+        }
 
         try {
             deployAll(env, date, existingRecords);
@@ -117,7 +124,7 @@ public class AdminPageController {
     }
 
     private void addToRecordAndSave(Record record, EnvDeploy deploy) throws Exception {
-        List<EnvDeploy> list = record.getEvironments();
+        List<EnvDeploy> list = record.getEnvironments();
         list.add(deploy);
         record.setEnvs(list);
         save(deploy);

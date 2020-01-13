@@ -96,7 +96,7 @@ public class StartPageController {
             setError(model, "Not valid object");
         }
 
-        return "staticData";
+        return "startPage";
     }
 
     void setError(Model model, String errorMsg) {

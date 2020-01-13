@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -66,12 +67,22 @@ public class RecordService {
     public String highestEnvironmentDeployed(Record record) {
         if (record.isProdDeployed()) {
             return "PROD";
-        } else if (record.isAcceptanceDeployed()){
+        } else if (record.isAcceptanceDeployed()) {
             return "ACC";
-        } else if (record.isSystestDeployed()){
+        } else if (record.isSystestDeployed()) {
             return "SYSTEST";
         }
         return "";
     }
+
+    public List<Record> getRecordsForSeveralTickets(String tickets) {
+        List<Record> records = new ArrayList<>();
+        String[] ids = tickets.split(",");
+        for (String id : ids) {
+            records.addAll(repository.findByTicketNumber(id.trim()));
+        }
+        return records;
+    }
+
 }
 

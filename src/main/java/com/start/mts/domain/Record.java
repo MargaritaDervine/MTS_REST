@@ -38,7 +38,7 @@ public class Record {
         this.envs = envs;
     }
 
-    public List<EnvDeploy> getEvironments() {
+    public List<EnvDeploy> getEnvironments() {
         return envs;
     }
 
@@ -112,7 +112,7 @@ public class Record {
 
     public boolean isEnvDeployed(String envName) {
         if (envName != null) {
-            List<EnvDeploy> envs = this.getEvironments();
+            List<EnvDeploy> envs = this.getEnvironments();
             for (EnvDeploy env : envs) {
                 if (envName.equals(env.getEnv())) {
                     return true;
@@ -120,5 +120,8 @@ public class Record {
             }
         }
         return false;
+    }
+    public String getLatestEnv(){
+        return "PROD";
     }
 }

@@ -22,12 +22,12 @@ public class StaticDataController {
     @Autowired
     EnvironmentRepository environmentRepository;
 
-    @RequestMapping(value = "/staticData", method = RequestMethod.GET)
+    @RequestMapping(value = "/staticDataPage", method = RequestMethod.GET)
     public String get(Model model) {
-        return "staticData";
+        return "staticDataPage";
     }
 
-    @RequestMapping(value = "/staticData", method = RequestMethod.POST)
+    @RequestMapping(value = "/staticDataPage", method = RequestMethod.POST)
     public String addName(@RequestParam(value = "name", required = false) String name,
                           @RequestParam(value = "envName", required = false) String envName,
                           @RequestParam(value = "isReference", required = false) boolean isReference,
@@ -37,7 +37,7 @@ public class StaticDataController {
             Name nameSaved = nameRepository.save(new Name(name));
             if (nameSaved.getNameId() != 0) {
                 model.addAttribute("successName", true);
-            }
+            } else  model.addAttribute("successName", false);
         }
 
         if (StringUtils.isNotEmpty(envName)) {
@@ -45,10 +45,9 @@ public class StaticDataController {
             Environment environmentSaved = environmentRepository.save(environment);
             if (isNotEmpty(environmentSaved.getEnvName())) {
                 model.addAttribute("successEnv", true);
-            }
+            } else  model.addAttribute("successEnv", false);
         }
 
-
-        return "staticData";
+        return "staticDataPage";
     }
 }

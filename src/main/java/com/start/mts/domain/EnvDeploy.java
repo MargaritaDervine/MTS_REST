@@ -62,4 +62,9 @@ public class EnvDeploy {
         this.date = date;
         this.record = recordId;
     }
+
+    @Override
+    public String toString() {
+        return env + ": " + date;
+    }
 }
