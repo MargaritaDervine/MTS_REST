@@ -10,55 +10,58 @@ public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int recordId;
-    private String userName;
-    private String referenceEnv;
+    @ManyToOne
+    private Name userName;
+    @ManyToOne
+    private Environment referenceEnvironment;
     private String ticketNumber;
-    private String objectType;
+    @ManyToOne
+    private ObjectType objectType;
     private String objectName;
-    private String action;
+    private Enum<Actions> action;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "record_id")
-    private List<EnvDeploy> envs;
+    private List<EnvDeploy> environments;
 
     public Record() {
     }
 
-    public Record(String userName, String referenceEnv, String ticketNumber, String objectType, String objectName, String action, List<EnvDeploy> envs) {
+    public Record(Name userName, Environment referenceEnv, String ticketNumber, ObjectType objectType, String objectName, Enum<Actions> action, List<EnvDeploy> environmentsDeployed) {
         this.userName = userName;
-        this.referenceEnv = referenceEnv;
+        this.referenceEnvironment = referenceEnv;
         this.ticketNumber = ticketNumber;
         this.objectType = objectType;
         this.objectName = objectName;
         this.action = action;
-        this.envs = envs;
+        this.environments = environmentsDeployed;
     }
 
-    public void setEnvs(List<EnvDeploy> envs) {
-        this.envs = envs;
+    public void setEnvironments(List<EnvDeploy> environments) {
+        this.environments = environments;
     }
 
     public List<EnvDeploy> getEnvironments() {
-        return envs;
+        return environments;
     }
 
     public int getRecordId() {
         return recordId;
     }
 
-    public String getUserName() {
+    public Name getUserName() {
         return userName;
     }
 
-    public String getReferenceEnv() {
-        return referenceEnv;
+    public Environment getReferenceEnvironment() {
+        return referenceEnvironment;
     }
 
     public String getTicketNumber() {
         return ticketNumber;
     }
 
-    public String getObjectType() {
+    public ObjectType getObjectType() {
         return objectType;
     }
 
@@ -66,7 +69,7 @@ public class Record {
         return objectName;
     }
 
-    public String getAction() {
+    public Enum<Actions> getAction() {
         return action;
     }
 
@@ -74,23 +77,23 @@ public class Record {
         this.recordId = recordId;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(Name userName) {
         this.userName = userName;
     }
 
-    public void setReferenceEnv(String referenceEnv) {
-        this.referenceEnv = referenceEnv;
+    public void setReferenceEnvironment(Environment referenceEnvironment) {
+        this.referenceEnvironment = referenceEnvironment;
     }
 
     public void setTicketNumber(String ticketNumber) {
         this.ticketNumber = ticketNumber;
     }
 
-    public void setObjectType(String objectType) {
+    public void setObjectType(ObjectType objectType) {
         this.objectType = objectType;
     }
 
-    public void setAction(String action) {
+    public void setAction(Enum<Actions> action) {
         this.action = action;
     }
 
@@ -114,7 +117,7 @@ public class Record {
         if (envName != null) {
             List<EnvDeploy> envs = this.getEnvironments();
             for (EnvDeploy env : envs) {
-                if (envName.equals(env.getEnv())) {
+                if (envName.equals(env.getEnvironment())) {
                     return true;
                 }
             }

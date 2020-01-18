@@ -6,11 +6,11 @@ import javax.persistence.*;
 @Table(name = "environments", schema = "mts")
 public class Environment {
     @Id
-    String envName;
+    String environmentName;
     boolean isReferenceEnvironment;
 
     public Environment(String envName, boolean isReferenceEnvironment) {
-        this.envName = envName;
+        this.environmentName = envName;
         this.isReferenceEnvironment = isReferenceEnvironment;
     }
 
@@ -18,16 +18,16 @@ public class Environment {
     }
 
 
-    public String getEnvName() {
-        return envName;
+    public String getEnvironmentName() {
+        return environmentName;
     }
 
     public boolean isReferenceEnvironment() {
         return isReferenceEnvironment;
     }
 
-    public void setEnvName(String envName) {
-        this.envName = envName;
+    public void setEnvironmentName(String environmentName) {
+        this.environmentName = environmentName;
     }
 
     public void setReferenceEnvironment(boolean referenceEnvironment) {
@@ -36,7 +36,7 @@ public class Environment {
 
     @Override
     public String toString() {
-        return envName;
+        return environmentName;
     }
 }
 

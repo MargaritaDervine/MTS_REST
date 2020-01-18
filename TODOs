@@ -1,5 +1,6 @@
-2) added comma in list - any way to fix it
 5) update record
 7) validator for each object type
 8) help page (how-to)
 9) Logging
+10) manual date - error parsing date
+11) error handling

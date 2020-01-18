@@ -18,7 +18,7 @@
 
     <!--Search menus-->
     <div class="form-group">
-        <div><label class="col col-form-label"> Search:</label></div>
+        <div><label class="col col-form-label font-weight-bold"> Search:</label></div>
         <form method="get" th:action="@{/adminPage}" class="form-inline">
             <div class="form-row">
                 <div class="col">
@@ -34,8 +34,8 @@
                     <select class="form-control " id="filterObjectType" name="filterObjectType">
                         <option disabled="disabled" selected value=" "> -- select an object type --</option>
                         <option th:each="ot : ${validObjectTypes}"
-                                th:value="${ot}"
-                                th:text="${ot}">
+                                th:value="${ot.getType()}"
+                                th:text="${ot.getType()}">
                         </option>
                     </select>
                 </div>
@@ -56,8 +56,8 @@
                     <select class="form-control " id="filterRefEnv" name="filterRefEnv">
                         <option disabled="disabled" selected value=" "> -- select ref env --</option>
                         <option th:each="ref : ${referenceEnvs}"
-                                th:value="${ref}"
-                                th:text="${ref}">
+                                th:value="${ref.getEnvironmentName()}"
+                                th:text="${ref.getEnvironmentName()}">
                         </option>
                     </select>
                 </div>
@@ -71,7 +71,7 @@
 
     <!--Deploy Ticket-->
     <div class="form-group">
-        <div><label class="col-md-2 col-form-label"> Deploy:</label></div>
+        <div><label class="col-md-2 col-form-label font-weight-bold"> Deploy:</label></div>
         <form th:action="@{/adminPage}" method="post" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="col">
@@ -103,7 +103,7 @@
                 <div class="alert alert-success" role="alert">Added!</div>
             </div>
             <div class="col">
-                <a class="btn btn-secondary" href="/adminPage" role="button">Deploy more</a>
+                <a class="btn btn-secondary" href="/adminPage" role="button">Back</a>
             </div>
         </div>
     </div>
@@ -120,7 +120,7 @@
 
     <!--Delete record-->
     <div class="form-group">
-        <div><label class="col-md-2 col-form-label"> Delete record by id:</label></div>
+        <div><label class="col-md-2 col-form-label font-weight-bold"> Delete record by id:</label></div>
         <form th:action="@{/adminPage}" method="post" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="col-sm-2">
@@ -129,39 +129,16 @@
                 <div class="col-sm-2">
                     <button type="submit" name="action" class=" mb-3 btn btn-primary">Delete</button>
                 </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-secondary" href="/adminPage" role="button">Back</a>
+                </div>
             </div>
         </form>
     </div>
 
     <!--List of records-->
-    <div>
-        <table class="table table-bordered" th:object="${records}" id="table">
-            <thead>
-            <tr>
-                <th scope="col">Record id</th>
-                <th scope="col">Ticket id</th>
-                <th scope="col">Action</th>
-                <th scope="col">Type</th>
-                <th scope="col">Object</th>
-                <th scope="col">Name</th>
-                <th scope="col">Ref env</th>
-                <th scope="col">Envs</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="record:${records}">
-                <td th:text="${record.getRecordId()}"></td>
-                <td th:text="${record.getTicketNumber()}"></td>
-                <td th:text="${record.getAction()}"></td>
-                <td th:text="${record.getObjectType()}"></td>
-                <td th:text="${record.getObjectName()}"></td>
-                <td th:text="${record.getUserName()}"></td>
-                <td th:text="${record.getReferenceEnv()}"></td>
-                <td th:text="${record.getEnvironments()}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    <div th:insert="listOfRecords"></div>
+
 </div>
 </body>
 </html>

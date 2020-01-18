@@ -6,8 +6,6 @@ import javax.persistence.*;
 @Table(name = "object_types", schema = "mts")
 public class ObjectType {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int objectTypeId;
     String type;
 
     public ObjectType(String type) {
@@ -15,5 +13,13 @@ public class ObjectType {
     }
 
     public ObjectType() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

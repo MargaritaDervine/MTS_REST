@@ -5,10 +5,7 @@ import com.start.mts.RecordService;
 import com.start.mts.db.EnvironmentRepository;
 import com.start.mts.db.NameRepository;
 import com.start.mts.db.RecordRepository;
-import com.start.mts.domain.Actions;
-import com.start.mts.domain.Environment;
-import com.start.mts.domain.Name;
-import com.start.mts.domain.Record;
+import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,7 +40,7 @@ public class StartPageController {
         List<String> existingTickets = service.getExistingTicketNumbers();
         model.addAttribute("existingTickets", existingTickets);
 
-        List<String> validObjectTypes = service.getObjectTypes();
+        List<ObjectType> validObjectTypes = service.getObjectTypes();
         model.addAttribute("validObjectTypes", validObjectTypes);
 
         Actions[] actions = Actions.values();
@@ -67,10 +64,10 @@ public class StartPageController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public String addNewRecord(Model model,
-                               @RequestParam(value = "refEnv", required = true) String refEnv,
-                               @RequestParam(value = "name", required = true) String name,
+                               @RequestParam(value = "refEnv", required = true) String refEnvStr,
+                               @RequestParam(value = "name", required = true) String nameStr,
                                @RequestParam(value = "ticketNumber", required = true) String ticketNumber,
-                               @RequestParam(value = "objectType", required = true) String objectTypeStr,
+                               @RequestParam(value = "objectType", required = true) String objectType,
                                @RequestParam(value = "objectName", required = true) String objectName,
                                @RequestParam(value = "action", required = true) String action) {
 
@@ -79,12 +76,8 @@ public class StartPageController {
             return "startPage";
         }
 
-        //this is workaround as there is comma after action and I can't find from where it appears
-        if (action.contains(",")) {
-            action = action.replace(",", "");
-        }
+        Record record = service.createNewRecord(ticketNumber, objectName, action, nameStr, refEnvStr, objectType);
 
-        Record record = new Record(name, refEnv, ticketNumber.toUpperCase(), objectTypeStr, objectName, action, null);
         if (validator.isValidObject(record)) {
             Record recordSaved = repository.save(record);
             if (recordSaved.getRecordId() != 0) {
@@ -98,6 +91,7 @@ public class StartPageController {
 
         return "startPage";
     }
+
 
     void setError(Model model, String errorMsg) {
         model.addAttribute("error", errorMsg);

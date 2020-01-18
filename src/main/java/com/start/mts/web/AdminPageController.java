@@ -44,13 +44,13 @@ public class AdminPageController {
         List<String> existingTickets = service.getExistingTicketNumbers();
         model.addAttribute("existingTickets", existingTickets);
 
-        List<String> validObjectTypes = service.getObjectTypes();
+        List<ObjectType> validObjectTypes = service.getObjectTypes();
         model.addAttribute("validObjectTypes", validObjectTypes);
 
         Actions[] actions = Actions.values();
         model.addAttribute("actions", actions);
 
-        List<String> envs = service.getAllEnvironments();
+        List<Environment> envs = service.getEnvironments();
         model.addAttribute("envs", envs);
 
         List<Environment> referenceEnvs = environmentRepository.findAllByIsReferenceEnvironment(true);
@@ -118,7 +118,7 @@ public class AdminPageController {
 
     private void deployAll(String env, Date date, List<Record> existingRecords) throws Exception {
         for (Record record : existingRecords) {
-            EnvDeploy deploy = new EnvDeploy(env, date, record);
+            EnvDeploy deploy = new EnvDeploy(environmentRepository.getOne(env), date, record);
             addToRecordAndSave(record, deploy);
         }
     }
@@ -126,7 +126,7 @@ public class AdminPageController {
     private void addToRecordAndSave(Record record, EnvDeploy deploy) throws Exception {
         List<EnvDeploy> list = record.getEnvironments();
         list.add(deploy);
-        record.setEnvs(list);
+        record.setEnvironments(list);
         save(deploy);
     }
 
@@ -142,7 +142,7 @@ public class AdminPageController {
 
     private void save(EnvDeploy deploy) throws Exception {
         EnvDeploy saved = envDeployRepository.save(deploy);
-        if (saved.getId() == 0) {
+        if (saved.getEnvDeployId() == 0) {
             throw new Exception("error saving deploy");
         }
     }

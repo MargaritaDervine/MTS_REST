@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface EnvironmentRepository extends JpaRepository<Environment, String> {
+
     List<Environment> findAllByIsReferenceEnvironment(boolean isReferenceEnvironment);
+
 }

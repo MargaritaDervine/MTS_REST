@@ -1,16 +1,19 @@
 package com.start.mts;
 
+import com.start.mts.db.EnvironmentRepository;
+import com.start.mts.db.NameRepository;
+import com.start.mts.db.ObjectTypeRepository;
 import com.start.mts.db.RecordRepository;
-import com.start.mts.domain.Record;
+import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,49 +21,55 @@ import java.util.List;
 public class RecordService {
 
     @Autowired
-    RecordRepository repository;
+    RecordRepository recordRepository;
+    @Autowired
+    EnvironmentRepository environmentRepository;
+    @Autowired
+    NameRepository nameRepository;
+    @Autowired
+    ObjectTypeRepository objectTypeRepository;
 
     public List<Record> findByCriteria(String filterTicketId,
                                        String filterObjectType,
                                        String filterObjectName,
                                        String filterName,
                                        String filterRefEnv) {
-        return repository.findAll((Specification<Record>) (root, query, criteriaBuilder) -> {
+        return recordRepository.findAll((Specification<Record>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (filterTicketId != null) {
                 predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("ticketNumber"), filterTicketId)));
             }
             if (filterObjectType != null) {
-                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("objectType"), filterObjectType)));
+                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("objectType"), new ObjectType(filterObjectType))));
             }
             if (StringUtils.isNotEmpty(filterObjectName)) {
                 predicates.add(criteriaBuilder.and(criteriaBuilder.like(root.get("objectName"), "%" + filterObjectName + "%")));
             }
             if (filterName != null) {
-                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("userName"), filterName)));
+                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("userName"), new Name(filterName))));
             }
             if (filterRefEnv != null) {
-                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("referenceEnv"), filterRefEnv)));
+                predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("referenceEnvironment"), new Environment(filterRefEnv, true))));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         });
     }
 
     public List<String> getExistingTicketNumbers() {
-        List<String> tickets = repository.findDistinctTicketNumbers();
+        List<String> tickets = recordRepository.findDistinctTicketNumbers();
         java.util.Collections.sort(tickets);
         return tickets;
     }
 
-    public List<String> getObjectTypes() {
-        List<String> types = repository.findDistinctObjectTypes();
-        java.util.Collections.sort(types);
+    public List<ObjectType> getObjectTypes() {
+        List<ObjectType> types = objectTypeRepository.findAll();
+        types.sort(Comparator.comparing(ObjectType::getType));
         return types;
     }
 
-    public List<String> getAllEnvironments() {
-        List<String> refEnvs = repository.findAllEnvironments();
-        java.util.Collections.sort(refEnvs);
+    public List<Environment> getEnvironments() {
+        List<Environment> refEnvs = environmentRepository.findAll();
+        refEnvs.sort(Comparator.comparing(Environment::getEnvironmentName));
         return refEnvs;
     }
 
@@ -79,9 +88,17 @@ public class RecordService {
         List<Record> records = new ArrayList<>();
         String[] ids = tickets.split(",");
         for (String id : ids) {
-            records.addAll(repository.findByTicketNumber(id.trim()));
+            records.addAll(recordRepository.findByTicketNumber(id.trim()));
         }
         return records;
+    }
+
+
+    public Record createNewRecord(String ticketNumber, String objectName, String action, String nameStr, String refEnvStr, String objectTypeStr) {
+        Name name = nameRepository.getOne(nameStr);
+        Environment refEnv = environmentRepository.getOne(refEnvStr);
+        ObjectType objectType = objectTypeRepository.getOne(objectTypeStr);
+        return new Record(name, refEnv, ticketNumber.toUpperCase(), objectType, objectName, Actions.valueOf(action), null);
     }
 
 }

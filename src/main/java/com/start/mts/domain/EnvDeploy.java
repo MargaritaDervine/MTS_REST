@@ -8,63 +8,64 @@ import java.util.Date;
 public class EnvDeploy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int envDeployId;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "record_id")
     private Record record;
-    private String env;
-    private Date date;
+    @ManyToOne
+    private Environment environment;
+    private Date deployDate;
 
-    public int getId() {
-        return id;
+    public int getEnvDeployId() {
+        return envDeployId;
     }
 
     public Record getRecord() {
         return record;
     }
 
-    public String getEnv() {
-        return env;
+    public Environment getEnvironment() {
+        return environment;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDeployDate() {
+        return deployDate;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setEnvDeployId(int envDeployId) {
+        this.envDeployId = envDeployId;
     }
 
     public void setRecord(Record record) {
         this.record = record;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDeployDate(Date deployDate) {
+        this.deployDate = deployDate;
     }
 
     public EnvDeploy() {
     }
 
-    public EnvDeploy(int id, Record record, String env, Date date) {
-        this.id = id;
+    public EnvDeploy(int envDeployId, Record record, Environment env, Date date) {
+        this.envDeployId = envDeployId;
         this.record = record;
-        this.env = env;
-        this.date = date;
+        this.environment = env;
+        this.deployDate = date;
     }
 
-    public EnvDeploy(String env, Date date, Record recordId) {
-        this.env = env;
-        this.date = date;
+    public EnvDeploy(Environment env, Date date, Record recordId) {
+        this.environment = env;
+        this.deployDate = date;
         this.record = recordId;
     }
 
     @Override
     public String toString() {
-        return env + ": " + date;
+        return environment + ": " + deployDate;
     }
 }

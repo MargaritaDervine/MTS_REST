@@ -35,7 +35,7 @@ public class StaticDataController {
 
         if (StringUtils.isNotEmpty(name)) {
             Name nameSaved = nameRepository.save(new Name(name));
-            if (nameSaved.getNameId() != 0) {
+            if (StringUtils.isNotEmpty(nameSaved.getName())) {
                 model.addAttribute("successName", true);
             } else  model.addAttribute("successName", false);
         }
@@ -43,7 +43,7 @@ public class StaticDataController {
         if (StringUtils.isNotEmpty(envName)) {
             Environment environment = new Environment(envName, isReference);
             Environment environmentSaved = environmentRepository.save(environment);
-            if (isNotEmpty(environmentSaved.getEnvName())) {
+            if (isNotEmpty(environmentSaved.getEnvironmentName())) {
                 model.addAttribute("successEnv", true);
             } else  model.addAttribute("successEnv", false);
         }
