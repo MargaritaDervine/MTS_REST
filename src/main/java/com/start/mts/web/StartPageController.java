@@ -7,6 +7,8 @@ import com.start.mts.db.NameRepository;
 import com.start.mts.db.RecordRepository;
 import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -28,6 +31,8 @@ public class StartPageController {
     NameRepository nameRepository;
     @Autowired
     ObjectValidator validator;
+
+    private static final Logger logger = LogManager.getLogger(StartPageController.class);
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String getRecords(@RequestParam(required = false) String filterTicketId,
@@ -58,6 +63,10 @@ public class StartPageController {
                 filterName,
                 filterRefEnv);
 
+        logger.info("Searching by criteria " + Arrays.asList(filterTicketId, filterObjectType, filterObjectName, filterName, filterRefEnv).toString()
+                + "; "
+                + "Found records: " + records.size());
+
         model.addAttribute("records", records);
         return "startPage";
     }
@@ -76,17 +85,22 @@ public class StartPageController {
             return "startPage";
         }
 
+        logger.info("Trying to create new record with details " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+
         Record record = service.createNewRecord(ticketNumber, objectName, action, nameStr, refEnvStr, objectType);
 
         if (validator.isValidObject(record)) {
             Record recordSaved = repository.save(record);
             if (recordSaved.getRecordId() != 0) {
                 model.addAttribute("success", true);
+                logger.info("Successfully added record " + Arrays.asList(record.getRecordId(), ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
             } else {
                 setError(model, "Failed to save");
+                logger.error("Failed to save record " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
             }
         } else {
             setError(model, "Not valid object");
+            logger.error("Record not valid " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
         }
 
         return "startPage";

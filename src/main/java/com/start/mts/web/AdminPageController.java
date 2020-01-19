@@ -7,6 +7,8 @@ import com.start.mts.db.NameRepository;
 import com.start.mts.db.RecordRepository;
 import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +35,7 @@ public class AdminPageController {
     @Autowired
     NameRepository nameRepository;
 
+    private static final Logger logger = LogManager.getLogger(AdminPageController.class);
 
     @RequestMapping(value = "/adminPage", method = RequestMethod.GET)
     public String getRecords(@RequestParam(required = false) String filterTicketId,
@@ -65,6 +69,10 @@ public class AdminPageController {
                 filterName,
                 filterRefEnv);
 
+        logger.info("Searching by criteria " + Arrays.asList(filterTicketId, filterObjectType, filterObjectName, filterName, filterRefEnv).toString()
+                + "; "
+                + "Found records: " + records.size());
+
         model.addAttribute("records", records);
         return "adminPage";
     }
@@ -78,6 +86,7 @@ public class AdminPageController {
 
         if (deleteId != null) {
             repository.deleteById(deleteId);
+            logger.info("Record deleted: " + deleteId);
             return "adminPage";
         }
 
@@ -93,7 +102,7 @@ public class AdminPageController {
         } catch (ParseException e) {
             model.addAttribute("error", "Error parsing date");
             model.addAttribute("success", false);
-            e.printStackTrace();
+            logger.error("Error parsing date " + dateStr, e);
             return "adminPage";
         }
 
@@ -105,11 +114,14 @@ public class AdminPageController {
             existingRecords = repository.findByTicketNumber(tickets.toUpperCase());
         }
 
+        logger.info("Trying to deploy records: " + existingRecords.toString());
+
         try {
             deployAll(env, date, existingRecords);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("success", false);
+            logger.error("Error deploying records: " + existingRecords.toString(), e);
         }
 
         model.addAttribute("success", true);
@@ -130,11 +142,13 @@ public class AdminPageController {
         save(deploy);
     }
 
-    private Date getDate(@RequestParam(value = "date", required = false) String dateStr) throws ParseException {
+    private Date getDate(String dateStr) throws ParseException {
         Date date;
         if (StringUtils.isEmpty(dateStr)) {
             date = new Date();
+            logger.info("Date and time is empty, taking current date: " + date.toString());
         } else {
+            logger.info("Parsing date: " + dateStr);
             date = DateFormat.getInstance().parse(dateStr);
         }
         return date;
@@ -143,7 +157,8 @@ public class AdminPageController {
     private void save(EnvDeploy deploy) throws Exception {
         EnvDeploy saved = envDeployRepository.save(deploy);
         if (saved.getEnvDeployId() == 0) {
-            throw new Exception("error saving deploy");
+            logger.error("Error saving deploy: " + deploy.toString());
+            throw new Exception("Error saving deploy");
         }
     }
 

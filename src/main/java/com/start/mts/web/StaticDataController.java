@@ -5,6 +5,8 @@ import com.start.mts.db.NameRepository;
 import com.start.mts.domain.Environment;
 import com.start.mts.domain.Name;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,8 @@ public class StaticDataController {
     @Autowired
     EnvironmentRepository environmentRepository;
 
+    private static final Logger logger = LogManager.getLogger(StaticDataController.class);
+
     @RequestMapping(value = "/staticDataPage", method = RequestMethod.GET)
     public String get(Model model) {
         return "staticDataPage";
@@ -37,7 +41,11 @@ public class StaticDataController {
             Name nameSaved = nameRepository.save(new Name(name));
             if (StringUtils.isNotEmpty(nameSaved.getName())) {
                 model.addAttribute("successName", true);
-            } else  model.addAttribute("successName", false);
+                logger.info("Name successfully saved: " + name);
+            } else {
+                model.addAttribute("successName", false);
+                logger.error("Error saving name: " + name);
+            }
         }
 
         if (StringUtils.isNotEmpty(envName)) {
@@ -45,7 +53,11 @@ public class StaticDataController {
             Environment environmentSaved = environmentRepository.save(environment);
             if (isNotEmpty(environmentSaved.getEnvironmentName())) {
                 model.addAttribute("successEnv", true);
-            } else  model.addAttribute("successEnv", false);
+                logger.info("Environment successfully saved: " + envName + " is reference: " + isReference);
+            } else {
+                model.addAttribute("successEnv", false);
+                logger.error("Error saving environment: " + envName + " is reference: " + isReference);
+            }
         }
 
         return "staticDataPage";
