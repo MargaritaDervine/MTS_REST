@@ -2,8 +2,10 @@ package com.start.mts.web;
 
 import com.start.mts.db.EnvironmentRepository;
 import com.start.mts.db.NameRepository;
+import com.start.mts.db.ObjectTypeRepository;
 import com.start.mts.domain.Environment;
 import com.start.mts.domain.Name;
+import com.start.mts.domain.ObjectType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +26,9 @@ public class StaticDataController {
     @Autowired
     EnvironmentRepository environmentRepository;
 
+    @Autowired
+    ObjectTypeRepository objectTypeRepository;
+
     private static final Logger logger = LogManager.getLogger(StaticDataController.class);
 
     @RequestMapping(value = "/staticDataPage", method = RequestMethod.GET)
@@ -35,6 +40,7 @@ public class StaticDataController {
     public String addName(@RequestParam(value = "name", required = false) String name,
                           @RequestParam(value = "envName", required = false) String envName,
                           @RequestParam(value = "isReference", required = false) boolean isReference,
+                          @RequestParam(value = "objectType", required = false) String objectType,
                           Model model) {
 
         if (StringUtils.isNotEmpty(name)) {
@@ -57,6 +63,17 @@ public class StaticDataController {
             } else {
                 model.addAttribute("successEnv", false);
                 logger.error("Error saving environment: " + envName + " is reference: " + isReference);
+            }
+        }
+
+        if (StringUtils.isNotEmpty(objectType)) {
+            ObjectType type = objectTypeRepository.save(new ObjectType(objectType));
+            if (StringUtils.isNotEmpty(type.getType())) {
+                model.addAttribute("successType", true);
+                logger.info("Object type successfully saved: " + type);
+            } else {
+                model.addAttribute("successType", false);
+                logger.error("Error saving object type: " + type);
             }
         }
 
