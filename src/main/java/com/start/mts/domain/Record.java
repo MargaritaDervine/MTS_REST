@@ -1,6 +1,8 @@
 package com.start.mts.domain;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -117,14 +119,22 @@ public class Record {
         if (envName != null) {
             List<EnvDeploy> envs = this.getEnvironments();
             for (EnvDeploy env : envs) {
-                if (envName.equals(env.getEnvironment())) {
+                if (envName.equals(env.getEnvironment().getEnvironmentName())) {
                     return true;
                 }
             }
         }
         return false;
     }
-    public String getLatestEnv(){
-        return "PROD";
+
+    public String getHighestEnvironmentDeployed() {
+        if (this.isProdDeployed()) {
+            return "PROD";
+        } else if (this.isAcceptanceDeployed()) {
+            return "ACC";
+        } else if (this.isSystestDeployed()) {
+            return "SYSTEST";
+        }
+        return StringUtils.EMPTY;
     }
 }

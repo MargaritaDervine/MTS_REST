@@ -1,5 +1,6 @@
 package com.start.mts.web;
 
+import com.start.mts.ControllerService;
 import com.start.mts.ObjectValidator;
 import com.start.mts.RecordService;
 import com.start.mts.db.EnvironmentRepository;
@@ -12,15 +13,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.start.mts.ControllerService.ATTRIBUTE_ERROR;
+import static com.start.mts.ControllerService.ATTRIBUTE_SUCCESS;
+
 @Controller
 public class StartPageController {
+
     @Autowired
     RecordService service;
     @Autowired
@@ -33,8 +36,9 @@ public class StartPageController {
     ObjectValidator validator;
 
     private static final Logger logger = LogManager.getLogger(StartPageController.class);
+    public static final String TEMPLATE_START_PAGE = "startPage";
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping(value = "/")
     public String getRecords(@RequestParam(required = false) String filterTicketId,
                              @RequestParam(required = false) String filterObjectType,
                              @RequestParam(required = false) String filterObjectName,
@@ -63,53 +67,64 @@ public class StartPageController {
                 filterName,
                 filterRefEnv);
 
-        logger.info("Searching by criteria " + Arrays.asList(filterTicketId, filterObjectType, filterObjectName, filterName, filterRefEnv).toString()
-                + "; "
-                + "Found records: " + records.size());
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Searching by criteria %s; Found records: %d", Arrays.asList(filterTicketId, filterObjectType, filterObjectName, filterName, filterRefEnv).toString(), records.size()));
+        }
 
-        model.addAttribute("records", records);
-        return "startPage";
+        model.addAttribute(ControllerService.ATTRIBUTE_RECORDS, records);
+        return TEMPLATE_START_PAGE;
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @PostMapping(value = "/")
     public String addNewRecord(Model model,
-                               @RequestParam(value = "refEnv", required = true) String refEnvStr,
-                               @RequestParam(value = "name", required = true) String nameStr,
-                               @RequestParam(value = "ticketNumber", required = true) String ticketNumber,
-                               @RequestParam(value = "objectType", required = true) String objectType,
-                               @RequestParam(value = "objectName", required = true) String objectName,
-                               @RequestParam(value = "action", required = true) String action) {
+                               @RequestParam(value = "refEnv") String refEnvStr,
+                               @RequestParam(value = "name") String nameStr,
+                               @RequestParam(value = "ticketNumber") String ticketNumber,
+                               @RequestParam(value = "objectType") String objectType,
+                               @RequestParam(value = "objectName") String objectName,
+                               @RequestParam(value = "action") String action) {
 
         if (StringUtils.isEmpty(ticketNumber) || StringUtils.isEmpty(objectName)) {
             setError(model, "All fields must be filled");
-            return "startPage";
+            return TEMPLATE_START_PAGE;
         }
-
-        logger.info("Trying to create new record with details " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Trying to create new record with details %s", Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString()));
+        }
 
         Record record = service.createNewRecord(ticketNumber, objectName, action, nameStr, refEnvStr, objectType);
 
         if (validator.isValidObject(record)) {
-            Record recordSaved = repository.save(record);
-            if (recordSaved.getRecordId() != 0) {
-                model.addAttribute("success", true);
-                logger.info("Successfully added record " + Arrays.asList(record.getRecordId(), ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
-            } else {
-                setError(model, "Failed to save");
-                logger.error("Failed to save record " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
-            }
+            tryToSave(model, record);
         } else {
             setError(model, "Not valid object");
-            logger.error("Record not valid " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+            if (logger.isInfoEnabled()) {
+                logger.error(String.format("Record not valid %s", Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString()));
+            }
         }
-
-        return "startPage";
+        return TEMPLATE_START_PAGE;
     }
 
+    private void tryToSave(Model model, Record record) {
+        Record recordSaved = repository.save(record);
+        if (recordSaved.getRecordId() != 0) {
+            model.addAttribute(ATTRIBUTE_SUCCESS, true);
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Successfully added record %s", Arrays.asList(record.getRecordId(), record.getTicketNumber(), record.getObjectName(), record.getAction(),
+                        record.getUserName(), record.getReferenceEnvironment(), record.getObjectType()).toString()));
+            }
+        } else {
+            setError(model, "Failed to save");
+            if (logger.isInfoEnabled()) {
+                logger.error(String.format("Failed to save record %s", Arrays.asList(record.getTicketNumber(), record.getObjectName(), record.getAction(),
+                        record.getUserName(), record.getReferenceEnvironment(), record.getObjectType()).toString()));
+            }
+        }
+    }
 
     void setError(Model model, String errorMsg) {
-        model.addAttribute("error", errorMsg);
-        model.addAttribute("success", false);
+        model.addAttribute(ATTRIBUTE_ERROR, errorMsg);
+        model.addAttribute(ATTRIBUTE_SUCCESS, false);
     }
 
 }

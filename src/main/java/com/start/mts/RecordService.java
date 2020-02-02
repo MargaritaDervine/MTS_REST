@@ -73,17 +73,6 @@ public class RecordService {
         return refEnvs;
     }
 
-    public String highestEnvironmentDeployed(Record record) {
-        if (record.isProdDeployed()) {
-            return "PROD";
-        } else if (record.isAcceptanceDeployed()) {
-            return "ACC";
-        } else if (record.isSystestDeployed()) {
-            return "SYSTEST";
-        }
-        return "";
-    }
-
     public List<Record> getRecordsForSeveralTickets(String tickets) {
         List<Record> records = new ArrayList<>();
         String[] ids = tickets.split(",");
@@ -92,7 +81,6 @@ public class RecordService {
         }
         return records;
     }
-
 
     public Record createNewRecord(String ticketNumber, String objectName, String action, String nameStr, String refEnvStr, String objectTypeStr) {
         Name name = nameRepository.getOne(nameStr);
