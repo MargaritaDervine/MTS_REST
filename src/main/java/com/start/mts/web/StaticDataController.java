@@ -89,7 +89,7 @@ public class StaticDataController {
 
     private void tryToSaveName(@RequestParam(value = "name", required = false) String name, Model model) {
         Name nameSaved = nameRepository.save(new Name(name));
-        if (StringUtils.isNotEmpty(nameSaved.getName())) {
+        if (StringUtils.isNotEmpty(nameSaved.getUserName())) {
             model.addAttribute(ControllerConstants.SUCCESS_NAME, true);
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("Name successfully saved: %s", name));
