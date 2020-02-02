@@ -1,6 +1,6 @@
 package com.start.mts.web;
 
-import com.start.mts.ControllerService;
+import com.start.mts.ControllerConstants;
 import com.start.mts.db.EnvironmentRepository;
 import com.start.mts.db.NameRepository;
 import com.start.mts.db.ObjectTypeRepository;
@@ -59,12 +59,12 @@ public class StaticDataController {
     private void tryToSaveObjectType(String objectType, Model model) {
         ObjectType type = objectTypeRepository.save(new ObjectType(objectType));
         if (StringUtils.isNotEmpty(type.getType())) {
-            model.addAttribute(ControllerService.SUCCESS_TYPE, true);
+            model.addAttribute(ControllerConstants.SUCCESS_TYPE, true);
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("Object type successfully saved: %s", type));
             }
         } else {
-            model.addAttribute(ControllerService.SUCCESS_TYPE, false);
+            model.addAttribute(ControllerConstants.SUCCESS_TYPE, false);
             if (logger.isErrorEnabled()) {
                 logger.error(String.format("Error saving object type: %s", type));
             }
@@ -75,12 +75,12 @@ public class StaticDataController {
         Environment environment = new Environment(envName, isReference);
         Environment environmentSaved = environmentRepository.save(environment);
         if (isNotEmpty(environmentSaved.getEnvironmentName())) {
-            model.addAttribute(ControllerService.SUCCESS_ENV, true);
+            model.addAttribute(ControllerConstants.SUCCESS_ENV, true);
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("Environment successfully saved: %s, is reference: %b", envName,  isReference));
             }
         } else {
-            model.addAttribute(ControllerService.SUCCESS_ENV, false);
+            model.addAttribute(ControllerConstants.SUCCESS_ENV, false);
             if (logger.isErrorEnabled()) {
                 logger.error(String.format("Error saving environment: %s, is reference: %b", envName, isReference));
             }
@@ -90,12 +90,12 @@ public class StaticDataController {
     private void tryToSaveName(@RequestParam(value = "name", required = false) String name, Model model) {
         Name nameSaved = nameRepository.save(new Name(name));
         if (StringUtils.isNotEmpty(nameSaved.getName())) {
-            model.addAttribute(ControllerService.SUCCESS_NAME, true);
+            model.addAttribute(ControllerConstants.SUCCESS_NAME, true);
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("Name successfully saved: %s", name));
             }
         } else {
-            model.addAttribute(ControllerService.SUCCESS_NAME, false);
+            model.addAttribute(ControllerConstants.SUCCESS_NAME, false);
             if (logger.isErrorEnabled()) {
                 logger.error(String.format("Error saving name: %s", name));
             }

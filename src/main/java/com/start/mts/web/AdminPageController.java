@@ -13,16 +13,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.start.mts.ControllerService.ATTRIBUTE_ERROR;
-import static com.start.mts.ControllerService.ATTRIBUTE_SUCCESS;
+import static com.start.mts.ControllerConstants.*;
 
 @Controller
 public class AdminPageController {
@@ -88,9 +89,15 @@ public class AdminPageController {
                                @RequestParam(value = "deleteId", required = false) Integer deleteId) {
 
         if (deleteId != null) {
-            repository.deleteById(deleteId);
-            if (logger.isInfoEnabled()) {
-                logger.info(String.format("Record deleted: %d", deleteId));
+            if (repository.existsById(deleteId)) {
+                repository.deleteById(deleteId);
+                if (logger.isInfoEnabled()) {
+                    logger.info(String.format("Record deleted: %d", deleteId));
+                }
+                model.addAttribute(SUCCESS_DELETE, true);
+            } else {
+                model.addAttribute(ATTRIBUTE_ERROR, String.format("Record with id %d does not exist", deleteId));
+                model.addAttribute(SUCCESS_DELETE, false);
             }
             return TEMPLATE_ADMIN_PAGE;
         }
@@ -112,6 +119,11 @@ public class AdminPageController {
         }
 
         List<Record> existingRecords = getRecords(tickets);
+        if (existingRecords.isEmpty()) {
+            model.addAttribute(ATTRIBUTE_ERROR, String.format("Record cannot be found by ticket id(s): %s", tickets));
+            model.addAttribute(ATTRIBUTE_SUCCESS, false);
+            return TEMPLATE_ADMIN_PAGE;
+        }
         if (logger.isInfoEnabled()) {
             logger.info(String.format("Trying to deploy records: %s", existingRecords.toString()));
         }
@@ -166,7 +178,7 @@ public class AdminPageController {
         if (logger.isInfoEnabled()) {
             logger.info(String.format("Parsing date: %s", dateStr));
         }
-        return DateFormat.getInstance().parse(dateStr);
+        return new SimpleDateFormat("yyyy-MM-DD'T'hh:mm").parse(dateStr);
     }
 
     private Date getNow() {

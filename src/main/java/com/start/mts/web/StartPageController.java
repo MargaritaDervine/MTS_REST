@@ -1,6 +1,6 @@
 package com.start.mts.web;
 
-import com.start.mts.ControllerService;
+import com.start.mts.ControllerConstants;
 import com.start.mts.ObjectValidator;
 import com.start.mts.RecordService;
 import com.start.mts.db.EnvironmentRepository;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.start.mts.ControllerService.ATTRIBUTE_ERROR;
-import static com.start.mts.ControllerService.ATTRIBUTE_SUCCESS;
+import static com.start.mts.ControllerConstants.ATTRIBUTE_ERROR;
+import static com.start.mts.ControllerConstants.ATTRIBUTE_SUCCESS;
 
 @Controller
 public class StartPageController {
@@ -71,7 +71,7 @@ public class StartPageController {
             logger.info(String.format("Searching by criteria %s; Found records: %d", Arrays.asList(filterTicketId, filterObjectType, filterObjectName, filterName, filterRefEnv).toString(), records.size()));
         }
 
-        model.addAttribute(ControllerService.ATTRIBUTE_RECORDS, records);
+        model.addAttribute(ControllerConstants.ATTRIBUTE_RECORDS, records);
         return TEMPLATE_START_PAGE;
     }
 
