@@ -2,7 +2,10 @@ package com.start.mts.web;
 
 import com.start.mts.ObjectValidator;
 import com.start.mts.RecordService;
-import com.start.mts.db.*;
+import com.start.mts.db.EnvironmentRepository;
+import com.start.mts.db.NameRepository;
+import com.start.mts.db.ObjectTypeRepository;
+import com.start.mts.db.RecordRepository;
 import com.start.mts.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -14,10 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static com.start.mts.ControllerConstants.*;
 
 @Controller
-public class UpdatePageController {
+public class UpdatePageController implements SetError{
 
     @Autowired
     RecordService service;
@@ -35,11 +42,12 @@ public class UpdatePageController {
     Record originalRecord = null;
 
     private static final Logger logger = LogManager.getLogger(UpdatePageController.class);
+    private static final String TEMPLATE_UPDATE_PAGE = "updatePage";
 
     @RequestMapping(value = "/updatePage", method = RequestMethod.GET)
     public String getRecords(Model model) {
         model.addAttribute("records", recordRepository.findAll());
-        return "updatePage";
+        return TEMPLATE_UPDATE_PAGE;
     }
 
     @RequestMapping(value = "/updatePage", method = RequestMethod.POST)
@@ -73,29 +81,29 @@ public class UpdatePageController {
             List<Name> names = nameRepository.findAll();
             model.addAttribute("names", names);
 
-            return "updatePage";
+            return TEMPLATE_UPDATE_PAGE;
         }
 
         if (originalRecord != null) {
 
             if (StringUtils.isEmpty(ticketNumber) || StringUtils.isEmpty(objectName)) {
-                setError(model, "All fields must be filled");
-                return "updatePage";
+                setError(model, ERROR_MSG_NOT_FILLED);
+                return TEMPLATE_UPDATE_PAGE;
             }
 
             updateRecord(model, ticketNumber, objectName, action, nameStr, refEnvStr, objectType);
 
             originalRecord = null;
-            return "updatePage";
+            return TEMPLATE_UPDATE_PAGE;
         }
 
-        return "updatePage";
+        return TEMPLATE_UPDATE_PAGE;
     }
 
     void updateRecord(Model model, String ticketNumber, String objectName, String action, String nameStr, String refEnvStr, String objectType) {
         Record updatedRecord = originalRecord;
 
-        logger.info("Trying to update record with details " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+        logger.info(String.format("Trying to update record with details %s", originalRecord));
 
         updatedRecord.setReferenceEnvironment(environmentRepository.getOne(refEnvStr));
         updatedRecord.setUserName(nameRepository.getOne(nameStr));
@@ -107,20 +115,15 @@ public class UpdatePageController {
         if (validator.isValidObject(updatedRecord)) {
             Record recordSaved = recordRepository.save(updatedRecord);
             if (recordSaved.getRecordId() != 0) {
-                model.addAttribute("success", true);
-                logger.info("Successfully updated record " + Arrays.asList(updatedRecord.getRecordId(), ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+                model.addAttribute(ATTRIBUTE_SUCCESS, true);
+                logger.info(String.format("Successfully updated record %s", recordSaved));
             } else {
-                setError(model, "Failed to save");
-                logger.error("Failed to save record " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+                setError(model, ERROR_FAILED_TO_SAVE);
+                logger.error(String.format("Failed to save record %s", updatedRecord));
             }
         } else {
-            setError(model, "Not valid object");
-            logger.error("Record not valid " + Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString());
+            setError(model, ERROR_NOT_VALID_OBJECT);
+            logger.error(String.format("Record not valid %s", updatedRecord));
         }
-    }
-
-    void setError(Model model, String errorMsg) {
-        model.addAttribute("error", errorMsg);
-        model.addAttribute("success", false);
     }
 }

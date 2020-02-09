@@ -60,8 +60,8 @@
                     <select class="form-control " id="filterName" name="filterName">
                         <option disabled="disabled" selected value=" "> -- select name --</option>
                         <option th:each="name : ${names}"
-                                th:value="${name.getName()}"
-                                th:text="${name.getName()}">
+                                th:value="${name.getUserName()}"
+                                th:text="${name.getUserName()}">
                         </option>
                     </select>
                 </div>
@@ -112,8 +112,8 @@
                 <div class="col">
                     <select class="form-control " id="names" name="name">
                         <option th:each="name : ${names}"
-                                th:value="${name.getName()}"
-                                th:text="${name.getName()}">
+                                th:value="${name.getUserName()}"
+                                th:text="${name.getUserName()}">
                         </option>
                     </select>
                 </div>

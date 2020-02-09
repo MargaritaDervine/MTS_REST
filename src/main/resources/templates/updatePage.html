@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <h1>MTS Rebirth</h1>
+    <h1>MTS Rebirth 1.0</h1>
 </div>
 <div class="container-fluid">
 
@@ -42,7 +42,7 @@
                 <div class="alert alert-success" role="alert">Saved!</div>
             </div>
             <div class="col">
-                <a class="btn btn-secondary" href="/" role="button">Back</a>
+                <a class="btn btn-secondary" href="/updatePage" role="button">Back</a>
             </div>
         </div>
     </div>
@@ -93,8 +93,8 @@
                     <div class="col">
                         <select class="form-control " id="names" name="name">
                             <option th:each="name : ${names}"
-                                    th:value="${name.getName()}"
-                                    th:text="${name.getName()}"
+                                    th:value="${name.getUserName()}"
+                                    th:text="${name.getUserName()}"
                                     th:selected="${name == recordToUpdate.getUserName()}">
                             </option>
                         </select>

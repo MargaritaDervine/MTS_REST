@@ -136,5 +136,20 @@ public class Record {
             return "SYSTEST";
         }
         return StringUtils.EMPTY;
+
+    }
+
+    @Override
+    public String toString() {
+        return "Record{" +
+                "recordId=" + recordId +
+                ", userName=" + userName +
+                ", referenceEnvironment=" + referenceEnvironment +
+                ", ticketNumber='" + ticketNumber + '\'' +
+                ", objectType=" + objectType +
+                ", objectName='" + objectName + '\'' +
+                ", action=" + action +
+                ", environments=" + environments +
+                '}';
     }
 }

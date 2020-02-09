@@ -18,11 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.start.mts.ControllerConstants.ATTRIBUTE_ERROR;
-import static com.start.mts.ControllerConstants.ATTRIBUTE_SUCCESS;
+import static com.start.mts.ControllerConstants.*;
 
 @Controller
-public class StartPageController {
+public class StartPageController implements SetError{
 
     @Autowired
     RecordService service;
@@ -85,7 +84,7 @@ public class StartPageController {
                                @RequestParam(value = "action") String action) {
 
         if (StringUtils.isEmpty(ticketNumber) || StringUtils.isEmpty(objectName)) {
-            setError(model, "All fields must be filled");
+            setError(model, ERROR_MSG_NOT_FILLED);
             return TEMPLATE_START_PAGE;
         }
         if (logger.isInfoEnabled()) {
@@ -97,7 +96,7 @@ public class StartPageController {
         if (validator.isValidObject(record)) {
             tryToSave(model, record);
         } else {
-            setError(model, "Not valid object");
+            setError(model, ERROR_NOT_VALID_OBJECT);
             if (logger.isInfoEnabled()) {
                 logger.error(String.format("Record not valid %s", Arrays.asList(ticketNumber, objectName, action, nameStr, refEnvStr, objectType).toString()));
             }
@@ -114,17 +113,12 @@ public class StartPageController {
                         record.getUserName(), record.getReferenceEnvironment(), record.getObjectType()).toString()));
             }
         } else {
-            setError(model, "Failed to save");
+            setError(model, ERROR_FAILED_TO_SAVE);
             if (logger.isInfoEnabled()) {
                 logger.error(String.format("Failed to save record %s", Arrays.asList(record.getTicketNumber(), record.getObjectName(), record.getAction(),
                         record.getUserName(), record.getReferenceEnvironment(), record.getObjectType()).toString()));
             }
         }
-    }
-
-    void setError(Model model, String errorMsg) {
-        model.addAttribute(ATTRIBUTE_ERROR, errorMsg);
-        model.addAttribute(ATTRIBUTE_SUCCESS, false);
     }
 
 }
