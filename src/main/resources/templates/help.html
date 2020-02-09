@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:background-color="http://www.w3.org/1999/xhtml">
 <head>
     <title>MTS Rebirth 1.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,6 +14,28 @@
 </div>
 <div class="container-fluid">
     <div th:insert="navBar"></div>
+
+    <p>
+    </p>
+
+    <!--colors - description-->
+
+    <div class="col">
+        <table class="table table-bordered" id="table">
+            <tbody>
+            <tr>
+                <td th:text="'Record deployed to production already'" th:style="'background-color: #D4FCD7'"></td>
+            </tr>
+            <tr>
+                <td th:text="'Record deployed to acceptance test'" th:style="'background-color: #FAFCD4'"></td>
+            </tr>
+            <tr>
+                <td th:text="'Record deployed to system test'" th:style="'background-color: #DBEFFE'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 </body>
 </html>

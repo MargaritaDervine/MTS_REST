@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:background-color="http://www.w3.org/1999/xhtml" xmlns:ackground-color="http://www.w3.org/1999/xhtml">
 <html lang="en">
 <div th:fragment="listOfRecords"></div>
-<div>
+
     <table class="table table-bordered" th:object="${records}" id="table">
         <thead>
         <tr>
@@ -17,17 +18,20 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="record:${records}" >
-            <td th:text="${record.getRecordId()}">
-            </td>
+
+        <tr th:each="record:${records}"
+            th:style="(${record.getHighestEnvironmentDeployed()}=='PROD') ? 'background-color: #D4FCD7' :
+             ((${record.getHighestEnvironmentDeployed()}=='ACCTEST') ? 'background-color: #FAFCD4' :
+                    ((${record.getHighestEnvironmentDeployed()}=='SYSTEST')  ? 'background-color: #DBEFFE' : 'background-color: #FDFEFE'))">
+
+            <td th:text="${record.getRecordId()}"></td>
             <td th:text="${record.getTicketNumber()}"></td>
             <td th:text="${record.getAction()}"></td>
             <td th:text="${record.getObjectType().getType()}"></td>
             <td th:text="${record.getObjectName()}"></td>
             <td th:text="${record.getUserName().getUserName()}"></td>
             <td th:text="${record.getReferenceEnvironment().getEnvironmentName()}"></td>
-            <td th:text="${record.getEnvironments()}">
-            </td>
+            <td th:text="${record.getEnvironments()}"></td>
         </tr>
         </tbody>
     </table>

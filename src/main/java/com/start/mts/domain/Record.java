@@ -131,7 +131,7 @@ public class Record {
         if (this.isProdDeployed()) {
             return "PROD";
         } else if (this.isAcceptanceDeployed()) {
-            return "ACC";
+            return "ACCTEST";
         } else if (this.isSystestDeployed()) {
             return "SYSTEST";
         }
