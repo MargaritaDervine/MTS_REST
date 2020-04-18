@@ -20,6 +20,8 @@ import java.util.List;
 @Component
 public class RecordService {
 
+    public static final String COMMA = ",";
+    public static final String EMPTY = " ";
     @Autowired
     RecordRepository recordRepository;
     @Autowired
@@ -61,21 +63,27 @@ public class RecordService {
         return tickets;
     }
 
-    public List<ObjectType> getObjectTypes() {
+    public List<ObjectType> getSortedObjectTypes() {
         List<ObjectType> types = objectTypeRepository.findAll();
         types.sort(Comparator.comparing(ObjectType::getType));
         return types;
     }
 
-    public List<Environment> getEnvironments() {
-        List<Environment> refEnvs = environmentRepository.findAll();
+    public List<Name> getSortedNames() {
+        List<Name> names = nameRepository.findAll();
+        names.sort(Comparator.comparing(Name::getUserName));
+        return names;
+    }
+
+    public List<Environment> getSortedRefEnvironments() {
+        List<Environment> refEnvs = environmentRepository.findAllByIsReferenceEnvironment(true);
         refEnvs.sort(Comparator.comparing(Environment::getEnvironmentName));
         return refEnvs;
     }
 
-    public List<Record> getRecordsForSeveralTickets(String tickets) {
+    public List<Record> getRecordsForSeveralTickets(String tickets, String separator) {
         List<Record> records = new ArrayList<>();
-        String[] ids = tickets.split(",");
+        String[] ids = tickets.split(separator);
         for (String id : ids) {
             records.addAll(recordRepository.findByTicketNumber(id.trim()));
         }
